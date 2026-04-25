@@ -1,0 +1,212 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   Global Styles — IT Helpdesk Portal
+   ─────────────────────────────────────────────────────────────────────────────
+   This file contains:
+   1. Tailwind directives (base, components, utilities)
+   2. CSS custom properties (design tokens not covered by Tailwind)
+   3. Global element resets
+   4. Reusable component utility classes (@layer components)
+   ───────────────────────────────────────────────────────────────────────────── */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* ── Tailwind directives ──────────────────────────────────────────────────── */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── CSS Custom Properties ────────────────────────────────────────────────── */
+@layer base {
+  :root {
+    --sidebar-width: 16rem;        /* 256px — matches w-64 */
+    --topbar-height: 4rem;         /* 64px  — matches h-16 */
+    --transition-fast: 150ms;
+    --transition-base: 200ms;
+    --border-radius-base: 0.5rem;  /* matches rounded-lg */
+  }
+
+  /* ── Base element styles ─────────────────────────────────────────────── */
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    @apply scroll-smooth;
+    /* Inter is loaded from Google Fonts above */
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+
+  body {
+    @apply bg-slate-50 text-slate-900 antialiased;
+    min-height: 100vh;
+  }
+
+  /* Accessible focus rings — replace default browser outlines */
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-primary-500;
+  }
+
+  /* Remove focus ring for mouse users */
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  /* ── Scrollbar styling (Webkit) ──────────────────────────────────────── */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-slate-100;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-slate-300 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-slate-400;
+  }
+}
+
+/* ── Reusable component classes ─────────────────────────────────────────────── */
+/* These extend Tailwind with multi-property shorthand classes that appear       */
+/* repeatedly throughout the app. Defined here to keep JSX clean.               */
+@layer components {
+
+  /* ── Card ────────────────────────────────────────────────────────────── */
+  .card {
+    @apply bg-white rounded-xl border border-slate-200 shadow-card;
+  }
+
+  .card-hover {
+    @apply card transition-shadow duration-200 hover:shadow-card-hover hover:border-slate-300;
+  }
+
+  /* ── Buttons ─────────────────────────────────────────────────────────── */
+  /* Base button — all buttons extend this */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg
+           font-medium text-sm leading-5
+           transition-all duration-150
+           focus-visible:ring-2 focus-visible:ring-offset-2
+           disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none;
+  }
+
+  .btn-primary {
+    @apply btn bg-primary-600 text-white
+           hover:bg-primary-700 active:bg-primary-800
+           focus-visible:ring-primary-500;
+  }
+
+  .btn-secondary {
+    @apply btn bg-white text-slate-700 border border-slate-300
+           hover:bg-slate-50 active:bg-slate-100
+           focus-visible:ring-slate-400;
+  }
+
+  .btn-danger {
+    @apply btn bg-red-600 text-white
+           hover:bg-red-700 active:bg-red-800
+           focus-visible:ring-red-500;
+  }
+
+  .btn-ghost {
+    @apply btn text-slate-600
+           hover:bg-slate-100 active:bg-slate-200
+           focus-visible:ring-slate-400;
+  }
+
+  .btn-sm {
+    @apply px-3 py-1.5 text-xs;
+  }
+
+  .btn-lg {
+    @apply px-6 py-3 text-base;
+  }
+
+  /* ── Form elements ───────────────────────────────────────────────────── */
+  .form-label {
+    @apply block text-sm font-medium text-slate-700 mb-1;
+  }
+
+  .form-input {
+    @apply w-full px-3 py-2 rounded-lg border border-slate-300
+           text-sm text-slate-900 placeholder-slate-400 bg-white
+           transition-colors duration-150
+           focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500
+           disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed;
+  }
+
+  .form-input-error {
+    @apply form-input border-red-400 focus:ring-red-500 focus:border-red-500;
+  }
+
+  .form-select {
+    @apply form-input appearance-none cursor-pointer;
+  }
+
+  .form-textarea {
+    @apply form-input resize-none;
+  }
+
+  .form-error {
+    @apply mt-1 text-xs text-red-600 flex items-center gap-1;
+  }
+
+  .form-hint {
+    @apply mt-1 text-xs text-slate-500;
+  }
+
+  /* ── Badges ──────────────────────────────────────────────────────────── */
+  .badge {
+    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  /* ── Table ───────────────────────────────────────────────────────────── */
+  .table-container {
+    @apply overflow-x-auto rounded-xl border border-slate-200;
+  }
+
+  .table {
+    @apply w-full text-sm text-left border-collapse;
+  }
+
+  .table th {
+    @apply px-4 py-3 bg-slate-50 text-slate-600 font-medium text-xs uppercase
+           tracking-wider border-b border-slate-200 whitespace-nowrap;
+  }
+
+  .table td {
+    @apply px-4 py-3 border-b border-slate-100 text-slate-700;
+  }
+
+  .table tr:last-child td {
+    @apply border-b-0;
+  }
+
+  .table tbody tr {
+    @apply hover:bg-slate-50 transition-colors duration-100;
+  }
+
+  /* ── Page layout helpers ─────────────────────────────────────────────── */
+  .page-header {
+    @apply mb-6 flex items-center justify-between;
+  }
+
+  .page-title {
+    @apply text-2xl font-semibold text-slate-900;
+  }
+
+  .page-subtitle {
+    @apply mt-1 text-sm text-slate-500;
+  }
+
+  /* ── Spinner ─────────────────────────────────────────────────────────── */
+  .spinner {
+    @apply animate-spin rounded-full border-2 border-slate-200 border-t-primary-600;
+  }
+}
