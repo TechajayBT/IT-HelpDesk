@@ -9,16 +9,16 @@
  * single column on mobile.
  */
 
-import React, { useState, useEffect } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { CheckCircle, Eye, EyeOff, Ticket } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Eye, EyeOff, Ticket, CheckCircle } from "lucide-react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
+  clearError,
   loginUser,
   registerUser,
-  clearError,
-  selectAuthLoading,
   selectAuthError,
+  selectAuthLoading,
   selectIsAuthenticated,
   selectUserRole,
 } from "../../store/slices/authSlice";
@@ -238,47 +238,250 @@ const PASSWORD_RULES = [
   { test: (p) => /[@$!%*?&#]/.test(p),   label: "One special character (@$!%*?&#)" },
 ];
 
+// export const RegisterPage = () => {
+//   const dispatch = useDispatch();
+//   const navigate = useNavigate();
+//   const isLoading = useSelector(selectAuthLoading);
+//   const error = useSelector(selectAuthError);
+//   const isAuthenticated = useSelector(selectIsAuthenticated);
+
+//   const [form, setForm] = useState({
+//     firstName: "", lastName: "", email: "",
+//     password: "", confirmPassword: "",
+//   });
+//   const [fieldErrors, setFieldErrors] = useState({});
+//   const [showPasswordRules, setShowPasswordRules] = useState(false);
+
+//   useEffect(() => {
+//     if (isAuthenticated) navigate("/dashboard", { replace: true });
+//   }, [isAuthenticated, navigate]);
+
+//   useEffect(() => {
+//     if (error) dispatch(clearError());
+//   }, [form]);
+
+//   const handleChange = (e) => {
+//     const { name, value } = e.target;
+//     setForm((prev) => ({ ...prev, [name]: value }));
+//     if (fieldErrors[name]) setFieldErrors((prev) => ({ ...prev, [name]: "" }));
+//   };
+
+//   const validate = () => {
+//     const errors = {};
+//     if (!form.firstName.trim()) errors.firstName = "First name is required";
+//     if (!form.lastName.trim()) errors.lastName = "Last name is required";
+//     if (!form.email) errors.email = "Email is required";
+//     else if (!/\S+@\S+\.\S+/.test(form.email)) errors.email = "Invalid email format";
+
+//     // Check all password complexity rules
+//     const failedRules = PASSWORD_RULES.filter((r) => !r.test(form.password));
+//     if (!form.password) {
+//       errors.password = "Password is required";
+//     } else if (failedRules.length > 0) {
+//       errors.password = `Password must have: ${failedRules.map((r) => r.label).join(", ")}`;
+//     }
+
+//     if (!form.confirmPassword) {
+//       errors.confirmPassword = "Please confirm your password";
+//     } else if (form.password !== form.confirmPassword) {
+//       errors.confirmPassword = "Passwords do not match";
+//     }
+
+//     setFieldErrors(errors);
+//     return Object.keys(errors).length === 0;
+//   };
+
+//   const handleSubmit = (e) => {
+//     e.preventDefault();
+//     if (!validate()) return;
+//     dispatch(registerUser(form));
+//   };
+
+//   return (
+//     <div className="min-h-screen flex">
+//       <BrandPanel />
+
+//       <div className="flex-1 flex items-center justify-center p-6 sm:p-10 bg-white overflow-y-auto">
+//         <div className="w-full max-w-sm py-4">
+//           {/* Mobile logo */}
+//           <div className="flex items-center gap-2 mb-8 lg:hidden">
+//             <div className="w-7 h-7 bg-primary-600 rounded-lg flex items-center justify-center">
+//               <Ticket className="w-4 h-4 text-white" />
+//             </div>
+//             <span className="font-bold text-slate-900">IT Helpdesk</span>
+//           </div>
+
+//           <h2 className="text-2xl font-bold text-slate-900 mb-1">Create account</h2>
+//           <p className="text-sm text-slate-500 mb-6">Get started with IT Helpdesk today</p>
+
+//           {error && <div className="mb-4"><ErrorBanner message={error} /></div>}
+
+//           <form onSubmit={handleSubmit} noValidate className="space-y-4">
+//             {/* Name row */}
+//             <div className="grid grid-cols-2 gap-3">
+//               <div>
+//                 <label htmlFor="firstName" className="form-label">First name</label>
+//                 <input
+//                   id="firstName" name="firstName" type="text"
+//                   autoComplete="given-name"
+//                   value={form.firstName} onChange={handleChange}
+//                   placeholder="Jane"
+//                   className={fieldErrors.firstName ? "form-input-error" : "form-input"}
+//                 />
+//                 {fieldErrors.firstName && <p className="form-error">{fieldErrors.firstName}</p>}
+//               </div>
+//               <div>
+//                 <label htmlFor="lastName" className="form-label">Last name</label>
+//                 <input
+//                   id="lastName" name="lastName" type="text"
+//                   autoComplete="family-name"
+//                   value={form.lastName} onChange={handleChange}
+//                   placeholder="Smith"
+//                   className={fieldErrors.lastName ? "form-input-error" : "form-input"}
+//                 />
+//                 {fieldErrors.lastName && <p className="form-error">{fieldErrors.lastName}</p>}
+//               </div>
+//             </div>
+
+//             {/* Email */}
+//             <div>
+//               <label htmlFor="email" className="form-label">Email address</label>
+//               <input
+//                 id="email" name="email" type="email"
+//                 autoComplete="email"
+//                 value={form.email} onChange={handleChange}
+//                 placeholder="you@company.com"
+//                 className={fieldErrors.email ? "form-input-error" : "form-input"}
+//               />
+//               {fieldErrors.email && <p className="form-error">{fieldErrors.email}</p>}
+//             </div>
+
+//             {/* Password */}
+//             <div>
+//               <label htmlFor="password" className="form-label">Password</label>
+//               <PasswordInput
+//                 id="password" value={form.password}
+//                 onChange={handleChange} placeholder="Create a strong password"
+//                 error={fieldErrors.password}
+//               />
+//               {fieldErrors.password && <p className="form-error">{fieldErrors.password}</p>}
+
+//               {/* Password strength checklist */}
+//               {(showPasswordRules || form.password) && (
+//                 <ul className="mt-2 space-y-1">
+//                   {PASSWORD_RULES.map((rule) => {
+//                     const passed = rule.test(form.password);
+//                     return (
+//                       <li key={rule.label} className={`text-xs flex items-center gap-1.5 ${passed ? "text-green-600" : "text-slate-400"}`}>
+//                         <span>{passed ? "✓" : "○"}</span>
+//                         {rule.label}
+//                       </li>
+//                     );
+//                   })}
+//                 </ul>
+//               )}
+
+//               {!form.password && (
+//                 <button type="button" onClick={() => setShowPasswordRules(true)} className="mt-1 text-xs text-primary-600 hover:underline">
+//                   View password requirements
+//                 </button>
+//               )}
+//             </div>
+
+//             {/* Confirm Password */}
+//             <div>
+//               <label htmlFor="confirmPassword" className="form-label">Confirm password</label>
+//               <PasswordInput
+//                 id="confirmPassword" value={form.confirmPassword}
+//                 onChange={handleChange} placeholder="Repeat your password"
+//                 error={fieldErrors.confirmPassword}
+//               />
+//               {fieldErrors.confirmPassword && <p className="form-error">{fieldErrors.confirmPassword}</p>}
+//             </div>
+
+//             <button type="submit" className="btn-primary w-full py-2.5 mt-2" disabled={isLoading}>
+//               {isLoading ? <><Spinner size="sm" /> Creating account...</> : "Create account"}
+//             </button>
+//           </form>
+
+//           <p className="mt-6 text-center text-sm text-slate-600">
+//             Already have an account?{" "}
+//             <Link to="/login" className="text-primary-600 font-medium hover:underline">
+//               Sign in
+//             </Link>
+//           </p>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
 export const RegisterPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
   const isLoading = useSelector(selectAuthLoading);
   const error = useSelector(selectAuthError);
   const isAuthenticated = useSelector(selectIsAuthenticated);
 
   const [form, setForm] = useState({
-    firstName: "", lastName: "", email: "",
-    password: "", confirmPassword: "",
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
   });
+
   const [fieldErrors, setFieldErrors] = useState({});
   const [showPasswordRules, setShowPasswordRules] = useState(false);
 
+  // ✅ Redirect when authenticated
   useEffect(() => {
-    if (isAuthenticated) navigate("/dashboard", { replace: true });
+    if (isAuthenticated) {
+      navigate("/dashboard", { replace: true });
+    }
   }, [isAuthenticated, navigate]);
 
+  // ✅ Clear error on typing
   useEffect(() => {
     if (error) dispatch(clearError());
-  }, [form]);
+  }, [form, dispatch]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
-    if (fieldErrors[name]) setFieldErrors((prev) => ({ ...prev, [name]: "" }));
+
+    setForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+
+    if (fieldErrors[name]) {
+      setFieldErrors((prev) => ({
+        ...prev,
+        [name]: "",
+      }));
+    }
   };
 
+  // ✅ Validation
   const validate = () => {
     const errors = {};
+
     if (!form.firstName.trim()) errors.firstName = "First name is required";
     if (!form.lastName.trim()) errors.lastName = "Last name is required";
-    if (!form.email) errors.email = "Email is required";
-    else if (!/\S+@\S+\.\S+/.test(form.email)) errors.email = "Invalid email format";
 
-    // Check all password complexity rules
+    if (!form.email) errors.email = "Email is required";
+    else if (!/\S+@\S+\.\S+/.test(form.email))
+      errors.email = "Invalid email format";
+
     const failedRules = PASSWORD_RULES.filter((r) => !r.test(form.password));
+
     if (!form.password) {
       errors.password = "Password is required";
     } else if (failedRules.length > 0) {
-      errors.password = `Password must have: ${failedRules.map((r) => r.label).join(", ")}`;
+      errors.password = `Password must have: ${failedRules
+        .map((r) => r.label)
+        .join(", ")}`;
     }
 
     if (!form.confirmPassword) {
@@ -291,10 +494,26 @@ export const RegisterPage = () => {
     return Object.keys(errors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  // ✅ 🚀 MAIN FIX: Auto-login after register
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validate()) return;
-    dispatch(registerUser(form));
+
+    try {
+      const resultAction = await dispatch(registerUser(form));
+
+      if (registerUser.fulfilled.match(resultAction)) {
+        // 👉 Auto login after successful registration
+        await dispatch(
+          loginUser({
+            email: form.email,
+            password: form.password,
+          })
+        );
+      }
+    } catch (err) {
+      console.error("Registration error:", err);
+    }
   };
 
   return (
@@ -311,102 +530,144 @@ export const RegisterPage = () => {
             <span className="font-bold text-slate-900">IT Helpdesk</span>
           </div>
 
-          <h2 className="text-2xl font-bold text-slate-900 mb-1">Create account</h2>
-          <p className="text-sm text-slate-500 mb-6">Get started with IT Helpdesk today</p>
+          <h2 className="text-2xl font-bold text-slate-900 mb-1">
+            Create account
+          </h2>
+          <p className="text-sm text-slate-500 mb-6">
+            Get started with IT Helpdesk today
+          </p>
 
-          {error && <div className="mb-4"><ErrorBanner message={error} /></div>}
+          {error && (
+            <div className="mb-4">
+              <ErrorBanner message={error} />
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} noValidate className="space-y-4">
-            {/* Name row */}
+            {/* Name */}
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label htmlFor="firstName" className="form-label">First name</label>
+                <label className="form-label">First name</label>
                 <input
-                  id="firstName" name="firstName" type="text"
-                  autoComplete="given-name"
-                  value={form.firstName} onChange={handleChange}
-                  placeholder="Jane"
-                  className={fieldErrors.firstName ? "form-input-error" : "form-input"}
+                  name="firstName"
+                  value={form.firstName}
+                  onChange={handleChange}
+                  className={
+                    fieldErrors.firstName
+                      ? "form-input-error"
+                      : "form-input"
+                  }
                 />
-                {fieldErrors.firstName && <p className="form-error">{fieldErrors.firstName}</p>}
+                {fieldErrors.firstName && (
+                  <p className="form-error">{fieldErrors.firstName}</p>
+                )}
               </div>
+
               <div>
-                <label htmlFor="lastName" className="form-label">Last name</label>
+                <label className="form-label">Last name</label>
                 <input
-                  id="lastName" name="lastName" type="text"
-                  autoComplete="family-name"
-                  value={form.lastName} onChange={handleChange}
-                  placeholder="Smith"
-                  className={fieldErrors.lastName ? "form-input-error" : "form-input"}
+                  name="lastName"
+                  value={form.lastName}
+                  onChange={handleChange}
+                  className={
+                    fieldErrors.lastName
+                      ? "form-input-error"
+                      : "form-input"
+                  }
                 />
-                {fieldErrors.lastName && <p className="form-error">{fieldErrors.lastName}</p>}
+                {fieldErrors.lastName && (
+                  <p className="form-error">{fieldErrors.lastName}</p>
+                )}
               </div>
             </div>
 
             {/* Email */}
             <div>
-              <label htmlFor="email" className="form-label">Email address</label>
+              <label className="form-label">Email</label>
               <input
-                id="email" name="email" type="email"
-                autoComplete="email"
-                value={form.email} onChange={handleChange}
-                placeholder="you@company.com"
-                className={fieldErrors.email ? "form-input-error" : "form-input"}
+                name="email"
+                value={form.email}
+                onChange={handleChange}
+                className={
+                  fieldErrors.email ? "form-input-error" : "form-input"
+                }
               />
-              {fieldErrors.email && <p className="form-error">{fieldErrors.email}</p>}
+              {fieldErrors.email && (
+                <p className="form-error">{fieldErrors.email}</p>
+              )}
             </div>
 
             {/* Password */}
             <div>
-              <label htmlFor="password" className="form-label">Password</label>
+              <label className="form-label">Password</label>
               <PasswordInput
-                id="password" value={form.password}
-                onChange={handleChange} placeholder="Create a strong password"
+                id="password"
+                value={form.password}
+                onChange={handleChange}
                 error={fieldErrors.password}
               />
-              {fieldErrors.password && <p className="form-error">{fieldErrors.password}</p>}
 
-              {/* Password strength checklist */}
+              {fieldErrors.password && (
+                <p className="form-error">{fieldErrors.password}</p>
+              )}
+
               {(showPasswordRules || form.password) && (
                 <ul className="mt-2 space-y-1">
                   {PASSWORD_RULES.map((rule) => {
                     const passed = rule.test(form.password);
                     return (
-                      <li key={rule.label} className={`text-xs flex items-center gap-1.5 ${passed ? "text-green-600" : "text-slate-400"}`}>
-                        <span>{passed ? "✓" : "○"}</span>
-                        {rule.label}
+                      <li
+                        key={rule.label}
+                        className={`text-xs flex items-center gap-1.5 ${
+                          passed ? "text-green-600" : "text-slate-400"
+                        }`}
+                      >
+                        {passed ? "✓" : "○"} {rule.label}
                       </li>
                     );
                   })}
                 </ul>
               )}
-
-              {!form.password && (
-                <button type="button" onClick={() => setShowPasswordRules(true)} className="mt-1 text-xs text-primary-600 hover:underline">
-                  View password requirements
-                </button>
-              )}
             </div>
 
             {/* Confirm Password */}
             <div>
-              <label htmlFor="confirmPassword" className="form-label">Confirm password</label>
+              <label className="form-label">Confirm Password</label>
               <PasswordInput
-                id="confirmPassword" value={form.confirmPassword}
-                onChange={handleChange} placeholder="Repeat your password"
+                id="confirmPassword"
+                value={form.confirmPassword}
+                onChange={handleChange}
                 error={fieldErrors.confirmPassword}
               />
-              {fieldErrors.confirmPassword && <p className="form-error">{fieldErrors.confirmPassword}</p>}
+
+              {fieldErrors.confirmPassword && (
+                <p className="form-error">
+                  {fieldErrors.confirmPassword}
+                </p>
+              )}
             </div>
 
-            <button type="submit" className="btn-primary w-full py-2.5 mt-2" disabled={isLoading}>
-              {isLoading ? <><Spinner size="sm" /> Creating account...</> : "Create account"}
+            <button
+              type="submit"
+              className="btn-primary w-full py-2.5 mt-2"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <>
+                  <Spinner size="sm" /> Processing...
+                </>
+              ) : (
+                "Create account"
+              )}
             </button>
           </form>
 
           <p className="mt-6 text-center text-sm text-slate-600">
             Already have an account?{" "}
-            <Link to="/login" className="text-primary-600 font-medium hover:underline">
+            <Link
+              to="/login"
+              className="text-primary-600 font-medium hover:underline"
+            >
               Sign in
             </Link>
           </p>
