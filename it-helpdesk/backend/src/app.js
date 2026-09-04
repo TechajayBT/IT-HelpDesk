@@ -48,7 +48,7 @@ app.use(helmet());
 // In production, restrict `origin` to the exact deployed frontend URL.
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:3000",
+    origin: process.env.CLIENT_URL || "http://localhost:3000" || "https://it-help-desk-sepia.vercel.app/",
     credentials: true, // Allow cookies/Authorization header
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
