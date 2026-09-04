@@ -47,15 +47,31 @@ app.use(helmet());
 // ── 2. CORS ───────────────────────────────────────────────────────────────────
 // Allow the React dev server and production client to make cross-origin requests.
 // In production, restrict `origin` to the exact deployed frontend URL.
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://it-help-desk-sepia.vercel.app/",          
+  process.env.CLIENT_URL,
+].filter(url => typeof url === "string" && url.length > 0);
+
 app.use(
   cors({
-    origin: [process.env.CLIENT_URL ,"http://localhost:3000" ,"https://it-help-desk-sepia.vercel.app/"].filter(boolean),
-    credentials: true, // Allow cookies/Authorization header
+    origin: function (origin, callback) {
+      // Allow requests with no origin (mobile apps, Postman, curl)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      } else {
+        return callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
+// Handle preflight requests
+app.options("*", cors());
 app.options("*", cors());
 
 // ── 3. Rate limiting ──────────────────────────────────────────────────────────
