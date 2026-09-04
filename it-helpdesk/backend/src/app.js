@@ -35,6 +35,7 @@ const ticketRoutes = require("./routes/ticketRoutes");
 const agentRoutes = require("./routes/agentRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
 const attachmentRoutes = require("./routes/attachmentRoutes");
+const { boolean } = require("joi");
 
 const app = express();
 
@@ -48,7 +49,7 @@ app.use(helmet());
 // In production, restrict `origin` to the exact deployed frontend URL.
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:3000" || "https://it-help-desk-sepia.vercel.app/",
+    origin: [process.env.CLIENT_URL ,"http://localhost:3000" ,"https://it-help-desk-sepia.vercel.app/"].filter(boolean),
     credentials: true, // Allow cookies/Authorization header
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
