@@ -72,7 +72,6 @@ app.use(
 
 // Handle preflight requests
 app.options("*", cors());
-app.options("*", cors());
 
 // ── 3. Rate limiting ──────────────────────────────────────────────────────────
 // Limits each IP to 100 requests per 15 minutes on all /api routes.
