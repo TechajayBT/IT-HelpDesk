@@ -49,7 +49,7 @@ app.use(helmet());
 // In production, restrict `origin` to the exact deployed frontend URL.
 const allowedOrigins = [
   "http://localhost:3000",
-  "https://it-help-desk-sepia.vercel.app/",          
+  "https://it-help-desk-sepia.vercel.app",          
   process.env.CLIENT_URL,
 ].filter(url => typeof url === "string" && url.length > 0);
 
